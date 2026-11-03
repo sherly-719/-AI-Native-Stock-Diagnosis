@@ -13,4 +13,4 @@
 
 ## 扶摇在线数据部署
 
-Cloudflare Worker 源码见 `worker/fuyao-proxy.js`。部署后在 Worker 的 Production 环境添加类型为 Secret 的 `FUYAO_API_KEY`，勿在代码或仓库粘贴真实值。公开接口为 `/price` 和 `/valuation`；前端固定调用 `stock-diagnosis-fuyao.719553957.workers.dev`。若更换 Worker 地址，需同步修改网页 `refreshLive()` 的 `base`。用户截图已证明两个端点返回 600519.SH 的非空数据；部署后还应在网页核对显示与时点。
+Cloudflare Worker 源码见 `worker/fuyao-proxy.js`。部署后在 Worker 的 Production 环境添加类型为 Secret 的 `FUYAO_API_KEY`，勿在代码或仓库粘贴真实值。公开接口为 `/price` 和 `/valuation`；前端固定调用 `stock-diagnosis-fuyao.719553957.workers.dev`。若更换 Worker 地址，需同步修改网页 `refreshLive()` 的 `base`。用户截图已证明两个端点返回 600519.SH 的非空数据，且网页显示了相应字段与时点。
