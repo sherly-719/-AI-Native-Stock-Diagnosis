@@ -18,7 +18,7 @@ function json(data, status, origin, cache = false) {
   if (cache) h['Cache-Control'] = 'public, max-age=3600';
   return new Response(JSON.stringify(data), {status, headers:h});
 }
-async function mcpPost(payload, token, session) {
+async function mcpPost(payload, token, session, phase) {
   const h = {
     'Content-Type':'application/json',
     'Accept':'application/json, text/event-stream',
@@ -26,12 +26,17 @@ async function mcpPost(payload, token, session) {
     'User-Agent':'stock-diagnosis-mvp'
   };
   if (session) h['Mcp-Session-Id'] = session;
-  const response = await fetch(IFIND_URL, {
-    method:'POST', headers:h, body:JSON.stringify(payload), signal:AbortSignal.timeout(10000)
-  });
-  if (!response.ok) throw Error('ifind_http_error');
-  const text = await response.text();
-  return {session:response.headers.get('Mcp-Session-Id'), data:text ? JSON.parse(text) : null};
+  let response;
+  try {
+    response = await fetch(IFIND_URL, {
+      method:'POST', headers:h, body:JSON.stringify(payload), signal:AbortSignal.timeout(10000)
+    });
+  } catch { throw Error(phase + '_network'); }
+  if (!response.ok) throw Error(phase + '_http_' + response.status);
+  try {
+    const text = await response.text();
+    return {session:response.headers.get('Mcp-Session-Id'), data:text ? JSON.parse(text) : null};
+  } catch { throw Error(phase + '_parse'); }
 }
 function parseMarket(result) {
   const text = result?.result?.content?.find(x => x.type === 'text')?.text;
@@ -59,15 +64,17 @@ async function market(env, origin) {
   try {
     const init = await mcpPost({jsonrpc:'2.0',id:1,method:'initialize',params:{
       protocolVersion:'2025-03-26',capabilities:{},clientInfo:{name:'stock-diagnosis-mvp',version:'1.0.0'}
-    }}, env.IFIND_MCP_TOKEN);
+    }}, env.IFIND_MCP_TOKEN, null, 'init');
     if (!init.session) throw Error('ifind_session_missing');
-    await mcpPost({jsonrpc:'2.0',method:'notifications/initialized'},env.IFIND_MCP_TOKEN,init.session);
+    await mcpPost({jsonrpc:'2.0',method:'notifications/initialized'},env.IFIND_MCP_TOKEN,init.session,'notify');
     const result = await mcpPost({jsonrpc:'2.0',id:2,method:'tools/call',params:{
       name:'index_data',arguments:{query:MARKET_QUERY}
-    }},env.IFIND_MCP_TOKEN,init.session);
+    }},env.IFIND_MCP_TOKEN,init.session,'call');
     return json(parseMarket(result.data),200,origin,true);
-  } catch {
-    return json({ok:false,error:'ifind_unavailable_or_unverified'},502,origin);
+  } catch (error) {
+    const known = /^(?:init|notify|call)_(?:network|parse|http_\d{3})$|^ifind_(?:session_missing|empty|bad_result|date_mismatch|symbol_mismatch|shape_mismatch|number_invalid)$/;
+    const stage = known.test(error?.message) ? error.message : 'unknown';
+    return json({ok:false,error:'ifind_unavailable_or_unverified',stage},502,origin);
   }
 }
 export default {
