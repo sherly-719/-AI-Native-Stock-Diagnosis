@@ -6,7 +6,7 @@
 
 数据：贵州茅台 2025 年年度报告，上交所 2026-04-17 披露。原始单位元，页面换算亿元；同比=(2025/2024-1)*100%。页面为固定快照，不宣称实时。行情与估值通过 Cloudflare Worker 代理扶摇 API 在线读取；同行及新闻因缺乏已验证的数据源而标未知。
 
-扶摇和 iFinD：扶摇 API Key 仅配置在 Cloudflare Worker Secret `FUYAO_API_KEY`，不在浏览器或仓库；`worker/fuyao-proxy.js` 固定代理 600519.SH 的行情与估值快照。页面验证响应状态、标的、时间戳和必需数值字段，失败显示未知。iFinD MCP 的市场背景路由代码已准备，线上 Secret 和 Worker 尚待验证；当前公开网页尚未接入。部署步骤见 `IFIND-DEPLOY.md`。
+扶摇和 iFinD：扶摇 API Key 仅配置在 Cloudflare Worker Secret `FUYAO_API_KEY`，不在浏览器或仓库；`worker/fuyao-proxy.js` 固定代理 600519.SH 的行情与估值快照。页面验证响应状态、标的、时间戳和必需数值字段，失败显示未知。iFinD MCP 已在本地通过查询验证，网页使用 `ifind-market.json` 展示 2026-11-02 沪深 300 历史快照，并标明静态且不会自动更新。iFinD Worker 在线路由目前在 Cloudflare 初始化连接失败，页面仅在它通过校验后才用在线结果替换静态快照；详见 `IFIND-DEPLOY.md`。
 
 边界：只支持一只示例股票的年报快照与扶摇在线行情、估值；公司类型切换展示维度选择机制，不把茅台数据冒充银行或科技公司数据。无在线 LLM、同业排名或交易建议。行情快照不保证逐笔实时，须以返回时间戳判断。
 
