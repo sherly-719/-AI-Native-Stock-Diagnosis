@@ -15,4 +15,8 @@
 
 Cloudflare Worker 源码见 `worker/fuyao-proxy.js`。部署后在 Worker 的 Production 环境添加类型为 Secret 的 `FUYAO_API_KEY`，勿在代码或仓库粘贴真实值。公开接口为 `/price` 和 `/valuation`；前端固定调用 `stock-diagnosis-fuyao.719553957.workers.dev`。若更换 Worker 地址，需同步修改网页 `refreshLive()` 的 `base`。用户截图已证明两个端点返回 600519.SH 的非空数据，且网页显示了相应字段与时点。
 
+## 环境变量与当前运行状态
 
+- `FUYAO_API_KEY`：Cloudflare Worker Production Secret；用于 600519.SH 行情和估值，网页当前在线使用。
+- `IFIND_MCP_TOKEN`：Cloudflare Worker Production Secret；本机 iFinD 验证通过，但 Worker 云端连接返回 `init_network`。网页目前使用 `ifind-market.json` 的 2026-11-02 历史静态快照，不会自动更新。
+- 公开仓库不含任何真实密钥。未接入运行时 LLM；问题关键词用于选择诊断维度，数值和降级由确定性代码处理。
