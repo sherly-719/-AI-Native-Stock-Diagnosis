@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "mode": "verified_static_snapshot",
+  "source": "同花顺 iFinD MCP",
+  "tool": "index_data",
+  "symbol": "399300.SZ",
+  "name": "沪深300",
+  "trade_date": "2026-11-02",
+  "verified_on": "2026-11-03",
+  "close": 4016.9179,
+  "change_pct": 0.7883,
+  "query": "沪深300指数2026年11月2日收盘点位和涨跌幅",
+  "note": "iFinD 接口未返回公开原始页面链接；本文件是已校验的历史快照，不会自动更新。"
+}
+
